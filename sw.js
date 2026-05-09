@@ -1,4 +1,4 @@
-const CACHE_NAME = 'uok-results-v2';
+const CACHE_NAME = 'uok-results-v3';
 const ASSETS = [
   '/',
   '/index.html',

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Scrapes student results from the University of Kelaniya Faculty of Science website.
-Compares with existing results and sends Telegram notification if new results found.
-Generates an updated index.html with embedded data.
+Smart scraping: checks 1 student per run (every 30 min). If new result detected, scrapes all.
+Saves results to data/results.json. Does NOT touch index.html.
 """
 
 import requests
@@ -39,6 +39,13 @@ STUDENT_IDS = [
     "EC/2023/077", "EC/2023/078", "EC/2023/079", "EC/2023/080", "EC/2023/081",
     "EC/2023/082", "EC/2023/083", "EC/2023/084",
 ]
+
+# IDs known to be password-protected (skip in rotation to save time)
+PROTECTED_IDS = {
+    "EC/2022/080", "EC/2023/004", "EC/2023/006", "EC/2023/040", "EC/2023/041",
+    "EC/2023/054", "EC/2023/060", "EC/2023/065", "EC/2023/066",
+    "EC/2023/070", "EC/2023/071",
+}
 
 
 def get_hidden_fields(soup):
@@ -301,506 +308,99 @@ def build_notification_message(newly_available, gpa_changes, timestamp):
             lines.append(f"  {sid}: {old_gpa} -> {new_gpa}")
         lines.append("")
 
-    total_new = len([r for r in newly_available])
+    total_new = len(newly_available)
     total_changes = len(gpa_changes)
     lines.append(f"Total: {total_new} new, {total_changes} changed")
 
     return "\n".join(lines)
 
 
-def generate_html(results, timestamp):
-    """Generate the index.html as a PWA with embedded results data."""
-    results.sort(key=lambda x: x.get("student_id", ""))
+def load_state(state_file):
+    """Load scrape state (rotation index, timestamp)."""
+    if os.path.exists(state_file):
+        with open(state_file) as f:
+            return json.load(f)
+    return {"next_index": 0, "timestamp": "", "mode": "rotation"}
 
-    data_json = json.dumps(results)
 
-    success = [r for r in results if not r.get("error")]
-    failed = [r for r in results if r.get("error")]
-    gpas = [float(r["gpa"]) for r in success if r.get("gpa")]
-    avg_gpa = sum(gpas) / len(gpas) if gpas else 0
-    max_gpa = max(gpas) if gpas else 0
-    min_gpa = min(gpas) if gpas else 0
+def save_state(state_file, state):
+    """Save scrape state."""
+    os.makedirs(os.path.dirname(state_file), exist_ok=True)
+    with open(state_file, "w") as f:
+        json.dump(state, f, indent=2)
 
-    # Build list of valid student IDs for login validation
-    valid_ids_json = json.dumps([r["student_id"] for r in results])
 
-    html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1a73e8">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="UoK Results">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="manifest" href="/manifest.json">
-<title>UoK Science Results</title>
-<style>
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif; background: #f0f2f5; color: #333; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }}
-
-/* ===== LOGIN PAGE ===== */
-.login-page {{
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
-  background: linear-gradient(180deg, #e0f7f1 0%, #b2dfdb 40%, #80cbc4 70%, #4db6ac 100%);
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}}
-.login-page.hidden {{
-  opacity: 0; transform: scale(1.05); pointer-events: none;
-}}
-.login-waves {{
-  position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
-}}
-.login-waves svg {{ width: 100%; height: 100%; display: block; }}
-.login-card {{
-  background: white; border-radius: 20px; padding: 40px 36px; width: 90%; max-width: 400px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 4px 20px rgba(0,0,0,0.06);
-  text-align: center; position: relative; z-index: 2;
-  animation: loginSlideUp 0.6s ease-out;
-}}
-@keyframes loginSlideUp {{
-  from {{ opacity: 0; transform: translateY(30px); }}
-  to {{ opacity: 1; transform: translateY(0); }}
-}}
-.login-card h2 {{
-  color: #00897b; font-size: 1.7em; margin-bottom: 6px; font-weight: 700;
-}}
-.login-card .login-subtitle {{
-  color: #78909c; font-size: 0.85em; margin-bottom: 28px;
-}}
-.login-field {{
-  position: relative; margin-bottom: 16px;
-}}
-.login-field input {{
-  width: 100%; padding: 14px 16px 14px 46px; border: 2px solid #e0e0e0; border-radius: 50px;
-  font-size: 0.95em; outline: none; background: #fafafa; color: #333;
-  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
-}}
-.login-field input:focus {{
-  border-color: #26a69a; box-shadow: 0 0 0 3px rgba(38,166,154,0.15); background: white;
-}}
-.login-field input::placeholder {{ color: #aaa; }}
-.login-field .field-icon {{
-  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-  color: #90a4ae; transition: color 0.3s;
-}}
-.login-field input:focus ~ .field-icon {{ color: #26a69a; }}
-.login-btn {{
-  width: 100%; padding: 14px; border: none; border-radius: 50px;
-  background: linear-gradient(135deg, #26a69a, #00897b);
-  color: white; font-size: 1em; font-weight: 600; letter-spacing: 1px;
-  cursor: pointer; margin-top: 8px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 15px rgba(38,166,154,0.35);
-}}
-.login-btn:hover {{ transform: translateY(-2px); box-shadow: 0 6px 20px rgba(38,166,154,0.45); }}
-.login-btn:active {{ transform: translateY(0); }}
-.login-error {{
-  color: #e53935; font-size: 0.82em; margin-top: 10px; min-height: 20px;
-  transition: opacity 0.3s;
-}}
-.login-footer {{
-  margin-top: 24px; color: #b0bec5; font-size: 0.75em;
-}}
-.login-footer a {{ color: #26a69a; text-decoration: none; }}
-
-/* ===== DASHBOARD ===== */
-.dashboard {{ display: none; }}
-.dashboard.visible {{ display: block; }}
-
-.header {{ background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; padding: 20px 16px; text-align: center; position: sticky; top: 0; z-index: 100; }}
-.header h1 {{ font-size: 1.3em; margin-bottom: 2px; }}
-.header p {{ opacity: 0.9; font-size: 0.85em; }}
-.header .meta {{ font-size: 0.72em; opacity: 0.75; margin-top: 6px; }}
-.header .logout-btn {{
-  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-  color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.75em;
-  cursor: pointer; transition: background 0.2s;
-}}
-.header .logout-btn:hover {{ background: rgba(255,255,255,0.25); }}
-.install-banner {{ display: none; background: #e8f0fe; border-bottom: 1px solid #c2d7f2; padding: 10px 16px; text-align: center; font-size: 0.85em; color: #1a73e8; cursor: pointer; }}
-.install-banner:hover {{ background: #d2e3fc; }}
-.install-banner.show {{ display: block; }}
-.container {{ max-width: 1200px; margin: 0 auto; padding: 12px 12px 80px; }}
-.summary-bar {{ display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }}
-.summary-card {{ background: white; border-radius: 10px; padding: 12px 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); text-align: center; }}
-.summary-card .num {{ font-size: 1.5em; font-weight: 700; }}
-.summary-card .label {{ font-size: 0.65em; color: #666; margin-top: 2px; }}
-.blue {{ color: #1a73e8; }}
-.green {{ color: #2e7d32; }}
-.red {{ color: #c62828; }}
-.search-bar {{ margin-bottom: 14px; display: flex; gap: 8px; position: sticky; top: 82px; z-index: 90; background: #f0f2f5; padding: 6px 0; }}
-.search-bar input {{ flex: 1; padding: 11px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.95em; outline: none; background: white; }}
-.search-bar input:focus {{ border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }}
-.sort-btn {{ padding: 11px 14px; border: 1px solid #ddd; border-radius: 10px; background: white; cursor: pointer; font-size: 0.85em; white-space: nowrap; }}
-.sort-btn:hover {{ background: #f0f2f5; }}
-.sort-btn.active {{ background: #1a73e8; color: white; border-color: #1a73e8; }}
-.student-card {{ background: white; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: hidden; }}
-.student-header {{ display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; cursor: pointer; user-select: none; -webkit-user-select: none; }}
-.student-header:active {{ background: #f0f2f5; }}
-.student-info {{ flex: 1; min-width: 0; }}
-.student-id {{ font-weight: 700; color: #1a73e8; font-size: 0.92em; }}
-.student-name {{ color: #555; font-size: 0.8em; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
-.student-gpa {{ text-align: right; flex-shrink: 0; margin-left: 8px; }}
-.gpa-value {{ font-size: 1.3em; font-weight: 700; }}
-.gpa-label {{ font-size: 0.65em; color: #888; }}
-.gpa-high {{ color: #2e7d32; }}
-.gpa-mid {{ color: #f57f17; }}
-.gpa-low {{ color: #c62828; }}
-.student-details {{ display: none; padding: 0 14px 12px; border-top: 1px solid #eee; }}
-.student-details.open {{ display: block; }}
-.course-table {{ width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.78em; }}
-.course-table th {{ background: #f0f2f5; padding: 6px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; }}
-.course-table td {{ padding: 5px 6px; border-bottom: 1px solid #eee; }}
-.course-table tr:active td {{ background: #f0f2f5; }}
-.grade-a {{ color: #2e7d32; font-weight: 600; }}
-.grade-b {{ color: #1565c0; font-weight: 600; }}
-.grade-c {{ color: #f57f17; font-weight: 600; }}
-.grade-d {{ color: #e65100; font-weight: 600; }}
-.grade-fail {{ color: #c62828; font-weight: 600; }}
-.no-results {{ background: white; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); color: #999; font-size: 0.9em; }}
-.no-results .student-id {{ color: #c62828; }}
-.toggle-icon {{ font-size: 1em; color: #999; margin-left: 8px; transition: transform 0.2s; flex-shrink: 0; }}
-.toggle-icon.open {{ transform: rotate(90deg); }}
-.absent {{ color: #c62828; font-style: italic; }}
-.detail-meta {{ margin-bottom: 6px; color: #666; font-size: 0.78em; line-height: 1.4; }}
-.count-badge {{ display: inline-block; background: #e8eaf6; color: #3f51b5; padding: 1px 6px; border-radius: 10px; font-size: 0.75em; margin-left: 4px; }}
-.tab-bar {{ position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e0e0e0; display: flex; padding: 6px 0; padding-bottom: max(6px, env(safe-area-inset-bottom)); z-index: 100; }}
-.tab {{ flex: 1; text-align: center; padding: 4px 0; font-size: 0.7em; color: #666; cursor: pointer; }}
-.tab.active {{ color: #1a73e8; font-weight: 600; }}
-.tab svg {{ display: block; margin: 0 auto 2px; }}
-@media (min-width: 601px) {{
-  .header h1 {{ font-size: 1.6em; }}
-  .summary-card .num {{ font-size: 1.8em; }}
-  .summary-card .label {{ font-size: 0.78em; }}
-  .student-header {{ padding: 14px 18px; }}
-  .container {{ padding: 16px 16px 24px; }}
-  .tab-bar {{ display: none; }}
-  .container {{ padding-bottom: 24px; }}
-  .search-bar {{ top: 90px; }}
-}}
-@media (max-width: 600px) {{
-  .summary-bar {{ grid-template-columns: repeat(3, 1fr); }}
-  .summary-bar .summary-card:nth-child(4),
-  .summary-bar .summary-card:nth-child(5) {{ grid-column: span 1; }}
-  .course-table {{ font-size: 0.7em; }}
-  .course-table th:nth-child(2), .course-table td:nth-child(2),
-  .course-table th:nth-child(3), .course-table td:nth-child(3),
-  .course-table th:nth-child(5), .course-table td:nth-child(5) {{ display: none; }}
-}}
-@media (max-width: 400px) {{
-  .summary-bar {{ grid-template-columns: repeat(2, 1fr); }}
-}}
-</style>
-</head>
-<body>
-
-<!-- ===== LOGIN PAGE ===== -->
-<div class="login-page" id="loginPage">
-  <div class="login-waves">
-    <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path fill="rgba(255,255,255,0.18)" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,213.3C672,224,768,224,864,208C960,192,1056,160,1152,154.7C1248,149,1344,171,1392,181.3L1440,192V320H0Z"/>
-      <path fill="rgba(255,255,255,0.12)" d="M0,288L48,272C96,256,192,224,288,213.3C384,203,480,213,576,229.3C672,245,768,267,864,261.3C960,256,1056,224,1152,213.3C1248,203,1344,213,1392,218.7L1440,224V320H0Z"/>
-      <path fill="rgba(255,255,255,0.08)" d="M0,256L48,261.3C96,267,192,277,288,277.3C384,277,480,267,576,250.7C672,235,768,213,864,213.3C960,213,1056,235,1152,245.3C1248,256,1344,256,1392,256L1440,256V320H0Z"/>
-    </svg>
-  </div>
-  <div class="login-card">
-    <h2>Welcome Back!</h2>
-    <p class="login-subtitle">UoK Faculty of Science - Year 2 Results</p>
-    <form onsubmit="handleLogin(event)">
-      <div class="login-field">
-        <input type="text" id="loginId" placeholder="Student ID (e.g. EC/2023/001)" autocomplete="off" autofocus>
-        <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </div>
-      <button type="submit" class="login-btn">VIEW RESULTS</button>
-      <div class="login-error" id="loginError"></div>
-    </form>
-    <div class="login-footer">University of Kelaniya &copy; 2025</div>
-  </div>
-</div>
-
-<!-- ===== DASHBOARD ===== -->
-<div class="dashboard" id="dashboard">
-<div class="install-banner" id="installBanner" onclick="installPWA()">
-  Install this app on your device for quick access
-</div>
-<div class="header" style="position:relative;">
-  <h1>UoK Science Results</h1>
-  <p>Faculty of Science - Year 2 (2023/2024)</p>
-  <p class="meta">Updated: {timestamp} | Auto-scraped every 3 hours</p>
-  <button class="logout-btn" onclick="handleLogout()">Logout</button>
-</div>
-<div class="container">
-  <div class="summary-bar">
-    <div class="summary-card"><div class="num blue">{len(results)}</div><div class="label">Total</div></div>
-    <div class="summary-card"><div class="num green">{len(success)}</div><div class="label">Results</div></div>
-    <div class="summary-card"><div class="num red">{len(failed)}</div><div class="label">Pending</div></div>
-    <div class="summary-card"><div class="num blue">{avg_gpa:.2f}</div><div class="label">Avg GPA</div></div>
-    <div class="summary-card"><div class="num green">{max_gpa:.2f}</div><div class="label">Top GPA</div></div>
-  </div>
-
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search ID, name, or course..." oninput="render()">
-    <button class="sort-btn" id="sortBtn" onclick="toggleSort()">Sort</button>
-  </div>
-
-  <div id="studentList"></div>
-</div>
-
-<div class="tab-bar">
-  <div class="tab active" onclick="showAll()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    All
-  </div>
-  <div class="tab" onclick="showResults()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-    Results
-  </div>
-  <div class="tab" onclick="showPending()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    Pending
-  </div>
-</div>
-</div><!-- end dashboard -->
-
-<script>
-var DATA = {data_json};
-var sortMode = 'default';
-var filterMode = 'all';
-var expanded = {{}};
-
-function gradeClass(g) {{
-  if (!g) return '';
-  var u = g.trim().toUpperCase();
-  if (u.startsWith('A')) return 'grade-a';
-  if (u.startsWith('B')) return 'grade-b';
-  if (u.startsWith('C')) return 'grade-c';
-  if (u.startsWith('D')) return 'grade-d';
-  if (u === '**' || u === 'E' || u === 'F') return 'grade-fail';
-  return '';
-}}
-
-function gpaClass(gpa) {{
-  var g = parseFloat(gpa);
-  if (isNaN(g)) return '';
-  if (g >= 2.5) return 'gpa-high';
-  if (g >= 1.5) return 'gpa-mid';
-  return 'gpa-low';
-}}
-
-function toggleDetails(id) {{
-  expanded[id] = !expanded[id];
-  render();
-}}
-
-function toggleSort() {{
-  var modes = ['default', 'gpa-desc', 'gpa-asc', 'name'];
-  var labels = ['Default', 'GPA ↓', 'GPA ↑', 'Name'];
-  var idx = modes.indexOf(sortMode);
-  idx = (idx + 1) % modes.length;
-  sortMode = modes[idx];
-  document.getElementById('sortBtn').textContent = labels[idx];
-  document.getElementById('sortBtn').className = sortMode === 'default' ? 'sort-btn' : 'sort-btn active';
-  render();
-}}
-
-function setTab(mode) {{
-  filterMode = mode;
-  document.querySelectorAll('.tab').forEach(function(t, i) {{
-    t.className = 'tab' + (['all','results','pending'][i] === mode ? ' active' : '');
-  }});
-  render();
-}}
-function showAll() {{ setTab('all'); }}
-function showResults() {{ setTab('results'); }}
-function showPending() {{ setTab('pending'); }}
-
-function render() {{
-  var query = document.getElementById('searchInput').value.toLowerCase();
-  var filtered = DATA.filter(function(s) {{
-    if (filterMode === 'results' && s.error) return false;
-    if (filterMode === 'pending' && !s.error) return false;
-    if (!query) return true;
-    var text = (s.student_id + ' ' + (s.name_initial||'') + ' ' + (s.full_name||'')).toLowerCase();
-    if (text.indexOf(query) >= 0) return true;
-    return (s.courses||[]).some(function(c) {{
-      return ((c['Course Code']||c['CourseCode']||'')).toLowerCase().indexOf(query) >= 0;
-    }});
-  }});
-
-  if (sortMode === 'gpa-desc') {{
-    filtered.sort(function(a,b) {{ return (parseFloat(b.gpa)||0) - (parseFloat(a.gpa)||0); }});
-  }} else if (sortMode === 'gpa-asc') {{
-    filtered.sort(function(a,b) {{ return (parseFloat(a.gpa)||0) - (parseFloat(b.gpa)||0); }});
-  }} else if (sortMode === 'name') {{
-    filtered.sort(function(a,b) {{ return (a.name_initial||'').localeCompare(b.name_initial||''); }});
-  }}
-
-  var html = '';
-  filtered.forEach(function(s) {{
-    var sid = s.student_id;
-    if (s.error) {{
-      html += '<div class="no-results"><span class="student-id">' + sid + '</span> — No results available</div>';
-      return;
-    }}
-    var isOpen = expanded[sid];
-    var gc = gpaClass(s.gpa);
-    var courseCount = (s.courses||[]).filter(function(c) {{ return c['Course Code'] && !c['Course Code'].startsWith('Course Code'); }}).length;
-    html += '<div class="student-card">';
-    html += '<div class="student-header" onclick="toggleDetails(\\'' + sid + '\\')">';
-    html += '<div class="student-info"><div class="student-id">' + sid + ' <span class="count-badge">' + courseCount + ' courses</span></div>';
-    html += '<div class="student-name">' + (s.name_initial||'N/A') + '</div></div>';
-    html += '<div class="student-gpa"><div class="gpa-value ' + gc + '">' + (s.gpa||'N/A') + '</div><div class="gpa-label">GPA</div></div>';
-    html += '<div class="toggle-icon' + (isOpen ? ' open' : '') + '">&#9654;</div>';
-    html += '</div>';
-
-    if (isOpen) {{
-      html += '<div class="student-details open">';
-      html += '<p class="detail-meta"><strong>Name:</strong> ' + (s.full_name||'') + '<br><strong>Credits:</strong> ' + (s.total_credit||'N/A') + ' | <strong>Non-GPA:</strong> ' + (s.non_gpa_credit||'N/A') + '</p>';
-      html += '<table class="course-table"><thead><tr><th>Course</th><th>Year</th><th>Att</th><th>Status</th><th>Note</th><th>Grade</th></tr></thead><tbody>';
-      (s.courses||[]).forEach(function(c) {{
-        var code = c['Course Code'] || c['CourseCode'] || '';
-        if (code.startsWith('Course Code')) return;
-        var grade = c['Grade'] || '';
-        var examNote = c['Exam Note'] || c['ExamNote'] || '';
-        var examStatus = c['ExamStatus'] || '';
-        var absCls = examStatus === 'Absent' ? ' class="absent"' : '';
-        html += '<tr><td>' + code + '</td><td>' + (c['AcYear']||'') + '</td><td>' + (c['Attempt']||'') + '</td><td' + absCls + '>' + examStatus + '</td><td>' + examNote + '</td><td class="' + gradeClass(grade) + '">' + grade + '</td></tr>';
-      }});
-      html += '</tbody></table></div>';
-    }}
-    html += '</div>';
-  }});
-
-  if (filtered.length === 0) {{
-    html = '<div style="text-align:center;color:#999;padding:40px;">No students match your search.</div>';
-  }}
-
-  document.getElementById('studentList').innerHTML = html;
-}}
-
-// PWA Install
-var deferredPrompt;
-window.addEventListener('beforeinstallprompt', function(e) {{
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('installBanner').classList.add('show');
-}});
-
-function installPWA() {{
-  if (deferredPrompt) {{
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(function() {{
-      deferredPrompt = null;
-      document.getElementById('installBanner').classList.remove('show');
-    }});
-  }}
-}}
-
-// Register Service Worker
-if ('serviceWorker' in navigator) {{
-  navigator.serviceWorker.register('/sw.js').catch(function() {{}});
-}}
-
-render();
-</script>
-
-<!-- ===== LOGIN SCRIPT ===== -->
-<script>
-var VALID_IDS = {valid_ids_json};
-
-function checkAuth() {{
-  var user = localStorage.getItem('uok_user');
-  if (user) {{
-    document.getElementById('loginPage').classList.add('hidden');
-    document.getElementById('dashboard').classList.add('visible');
-    return true;
-  }}
-  return false;
-}}
-
-function handleLogin(e) {{
-  e.preventDefault();
-  var input = document.getElementById('loginId').value.trim().toUpperCase();
-  var errorEl = document.getElementById('loginError');
-
-  if (!input) {{
-    errorEl.textContent = 'Please enter your Student ID';
-    return;
-  }}
-
-  // Normalize: accept formats like EC2023001, EC/2023/001, ec/2023/001
-  var normalized = input.replace(/[^A-Z0-9]/g, '');
-  var match = normalized.match(/^EC(\\d{{4}})(\\d{{3}})$/);
-  if (match) {{
-    input = 'EC/' + match[1] + '/' + match[2];
-  }}
-
-  if (VALID_IDS.indexOf(input) === -1) {{
-    errorEl.textContent = 'Student ID not found. Please check and try again.';
-    document.getElementById('loginId').style.borderColor = '#e53935';
-    setTimeout(function() {{
-      document.getElementById('loginId').style.borderColor = '';
-    }}, 2000);
-    return;
-  }}
-
-  localStorage.setItem('uok_user', input);
-  errorEl.textContent = '';
-  document.getElementById('loginPage').classList.add('hidden');
-  setTimeout(function() {{
-    document.getElementById('dashboard').classList.add('visible');
-  }}, 400);
-}}
-
-function handleLogout() {{
-  localStorage.removeItem('uok_user');
-  document.getElementById('dashboard').classList.remove('visible');
-  document.getElementById('loginPage').classList.remove('hidden');
-  document.getElementById('loginId').value = '';
-  document.getElementById('loginError').textContent = '';
-}}
-
-// Auto-login if already authenticated
-checkAuth();
-</script>
-</body>
-</html>"""
-    return html
+def get_next_scrapeable_index(current_index):
+    """Get next student index, skipping protected IDs."""
+    total = len(STUDENT_IDS)
+    for _ in range(total):
+        current_index = current_index % total
+        if STUDENT_IDS[current_index] not in PROTECTED_IDS:
+            return current_index
+        current_index += 1
+    return 0  # fallback
 
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     repo_dir = os.path.dirname(script_dir)
     data_file = os.path.join(repo_dir, "data", "results.json")
-    html_file = os.path.join(repo_dir, "index.html")
+    state_file = os.path.join(repo_dir, "data", "scrape_state.json")
 
-    # Load existing results
+    # Load existing results & state
     old_results = []
     if os.path.exists(data_file):
         with open(data_file) as f:
             old_results = json.load(f)
         logger.info(f"Loaded {len(old_results)} existing results")
 
-    # Scrape fresh results
-    logger.info("Starting scrape of all students...")
-    new_results = scrape_all_students()
-    logger.info(f"Scraped {len(new_results)} students")
-
-    success_count = len([r for r in new_results if not r.get("error")])
-    fail_count = len([r for r in new_results if r.get("error")])
-    logger.info(f"Results: {success_count} success, {fail_count} failed/no-data")
-
-    # Detect changes
-    newly_available, gpa_changes = detect_changes(old_results, new_results)
-    has_changes = len(newly_available) > 0 or len(gpa_changes) > 0
-
+    state = load_state(state_file)
     ist = timezone(timedelta(hours=5, minutes=30))
     timestamp = datetime.now(ist).strftime("%Y-%m-%d %H:%M IST")
+
+    # --- Smart scraping: check 1 student, full scrape if new result ---
+    idx = get_next_scrapeable_index(state.get("next_index", 0))
+    probe_sid = STUDENT_IDS[idx]
+    logger.info(f"Probe scraping [{idx}] {probe_sid}...")
+    probe_result = scrape_student(probe_sid)
+
+    # Check if this student's result changed
+    old_map = {r["student_id"]: r for r in old_results}
+    old_probe = old_map.get(probe_sid, {})
+    probe_changed = False
+
+    if old_probe.get("error") and not probe_result.get("error"):
+        probe_changed = True
+        logger.info(f"NEW result detected for {probe_sid}!")
+    elif not old_probe.get("error") and not probe_result.get("error"):
+        if old_probe.get("gpa") != probe_result.get("gpa"):
+            probe_changed = True
+            logger.info(f"GPA changed for {probe_sid}!")
+
+    if probe_changed:
+        # Full scrape triggered
+        logger.info("Change detected — running FULL scrape of all students...")
+        new_results = scrape_all_students()
+    else:
+        # Just update the one student in the existing results
+        logger.info(f"No change for {probe_sid}. Updating single result.")
+        new_results = list(old_results)  # copy
+        # Replace or add the probe result
+        found = False
+        for i, r in enumerate(new_results):
+            if r["student_id"] == probe_sid:
+                new_results[i] = probe_result
+                found = True
+                break
+        if not found:
+            new_results.append(probe_result)
+
+    # Sort by student ID
+    new_results.sort(key=lambda x: x.get("student_id", ""))
+
+    # Detect changes for notification
+    newly_available, gpa_changes = detect_changes(old_results, new_results)
+    has_changes = len(newly_available) > 0 or len(gpa_changes) > 0
 
     if has_changes:
         logger.info(f"Changes detected: {len(newly_available)} new, {len(gpa_changes)} changed")
@@ -815,29 +415,30 @@ def main():
         else:
             logger.warning("TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set, skipping notification")
     else:
-        logger.info("No changes detected since last scrape")
+        logger.info("No changes detected")
 
-    # Save new results
+    # Save results
     os.makedirs(os.path.dirname(data_file), exist_ok=True)
     with open(data_file, "w") as f:
         json.dump(new_results, f, indent=2)
     logger.info(f"Saved results to {data_file}")
 
-    # Generate HTML
-    html = generate_html(new_results, timestamp)
-    with open(html_file, "w") as f:
-        f.write(html)
-    logger.info(f"Generated {html_file}")
+    # Update state — advance to next student for next run
+    next_idx = get_next_scrapeable_index(idx + 1)
+    state["next_index"] = next_idx
+    state["timestamp"] = timestamp
+    save_state(state_file, state)
+    logger.info(f"Next probe: [{next_idx}] {STUDENT_IDS[next_idx]}")
 
     # Set output for GitHub Actions
     github_output = os.environ.get("GITHUB_OUTPUT", "")
     if github_output:
         with open(github_output, "a") as f:
             f.write(f"has_changes={'true' if has_changes else 'false'}\n")
-            f.write(f"success_count={success_count}\n")
-            f.write(f"fail_count={fail_count}\n")
-            f.write(f"new_results={len(newly_available)}\n")
-            f.write(f"gpa_changes={len(gpa_changes)}\n")
+
+    success = len([r for r in new_results if not r.get("error")])
+    failed = len([r for r in new_results if r.get("error")])
+    logger.info(f"Final: {success} with results, {failed} errors/protected")
 
     return has_changes
 
@@ -845,7 +446,7 @@ def main():
 if __name__ == "__main__":
     try:
         changed = main()
-        sys.exit(0 if changed or True else 0)  # Always exit 0
+        sys.exit(0)
     except Exception as e:
         logger.error(f"Fatal error: {e}", exc_info=True)
         sys.exit(1)

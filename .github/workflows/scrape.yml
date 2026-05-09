@@ -3,7 +3,7 @@ name: Scrape Results
 on:
   schedule:
     # Run every 3 hours
-    - cron: '0 */3 * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
     # Allow manual trigger from GitHub Actions tab
 
@@ -38,7 +38,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
-          git add data/results.json index.html
+          git add data/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

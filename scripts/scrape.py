@@ -13,7 +13,7 @@ import json
 import os
 import sys
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -321,6 +321,9 @@ def generate_html(results, timestamp):
     max_gpa = max(gpas) if gpas else 0
     min_gpa = min(gpas) if gpas else 0
 
+    # Build list of valid student IDs for login validation
+    valid_ids_json = json.dumps([r["student_id"] for r in results])
+
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -336,10 +339,89 @@ def generate_html(results, timestamp):
 <style>
 * {{ box-sizing: border-box; margin: 0; padding: 0; }}
 body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif; background: #f0f2f5; color: #333; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }}
+
+/* ===== LOGIN PAGE ===== */
+.login-page {{
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
+  background: linear-gradient(180deg, #e0f7f1 0%, #b2dfdb 40%, #80cbc4 70%, #4db6ac 100%);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}}
+.login-page.hidden {{
+  opacity: 0; transform: scale(1.05); pointer-events: none;
+}}
+.login-waves {{
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
+}}
+.login-waves svg {{ width: 100%; height: 100%; display: block; }}
+.login-card {{
+  background: white; border-radius: 20px; padding: 40px 36px; width: 90%; max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 4px 20px rgba(0,0,0,0.06);
+  text-align: center; position: relative; z-index: 2;
+  animation: loginSlideUp 0.6s ease-out;
+}}
+@keyframes loginSlideUp {{
+  from {{ opacity: 0; transform: translateY(30px); }}
+  to {{ opacity: 1; transform: translateY(0); }}
+}}
+.login-card h2 {{
+  color: #00897b; font-size: 1.7em; margin-bottom: 6px; font-weight: 700;
+}}
+.login-card .login-subtitle {{
+  color: #78909c; font-size: 0.85em; margin-bottom: 28px;
+}}
+.login-field {{
+  position: relative; margin-bottom: 16px;
+}}
+.login-field input {{
+  width: 100%; padding: 14px 16px 14px 46px; border: 2px solid #e0e0e0; border-radius: 50px;
+  font-size: 0.95em; outline: none; background: #fafafa; color: #333;
+  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+}}
+.login-field input:focus {{
+  border-color: #26a69a; box-shadow: 0 0 0 3px rgba(38,166,154,0.15); background: white;
+}}
+.login-field input::placeholder {{ color: #aaa; }}
+.login-field .field-icon {{
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: #90a4ae; transition: color 0.3s;
+}}
+.login-field input:focus ~ .field-icon {{ color: #26a69a; }}
+.login-btn {{
+  width: 100%; padding: 14px; border: none; border-radius: 50px;
+  background: linear-gradient(135deg, #26a69a, #00897b);
+  color: white; font-size: 1em; font-weight: 600; letter-spacing: 1px;
+  cursor: pointer; margin-top: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(38,166,154,0.35);
+}}
+.login-btn:hover {{ transform: translateY(-2px); box-shadow: 0 6px 20px rgba(38,166,154,0.45); }}
+.login-btn:active {{ transform: translateY(0); }}
+.login-error {{
+  color: #e53935; font-size: 0.82em; margin-top: 10px; min-height: 20px;
+  transition: opacity 0.3s;
+}}
+.login-footer {{
+  margin-top: 24px; color: #b0bec5; font-size: 0.75em;
+}}
+.login-footer a {{ color: #26a69a; text-decoration: none; }}
+
+/* ===== DASHBOARD ===== */
+.dashboard {{ display: none; }}
+.dashboard.visible {{ display: block; }}
+
 .header {{ background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; padding: 20px 16px; text-align: center; position: sticky; top: 0; z-index: 100; }}
 .header h1 {{ font-size: 1.3em; margin-bottom: 2px; }}
 .header p {{ opacity: 0.9; font-size: 0.85em; }}
 .header .meta {{ font-size: 0.72em; opacity: 0.75; margin-top: 6px; }}
+.header .logout-btn {{
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.75em;
+  cursor: pointer; transition: background 0.2s;
+}}
+.header .logout-btn:hover {{ background: rgba(255,255,255,0.25); }}
 .install-banner {{ display: none; background: #e8f0fe; border-bottom: 1px solid #c2d7f2; padding: 10px 16px; text-align: center; font-size: 0.85em; color: #1a73e8; cursor: pointer; }}
 .install-banner:hover {{ background: #d2e3fc; }}
 .install-banner.show {{ display: block; }}
@@ -416,13 +498,41 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxyg
 </style>
 </head>
 <body>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div class="login-page" id="loginPage">
+  <div class="login-waves">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path fill="rgba(255,255,255,0.18)" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,213.3C672,224,768,224,864,208C960,192,1056,160,1152,154.7C1248,149,1344,171,1392,181.3L1440,192V320H0Z"/>
+      <path fill="rgba(255,255,255,0.12)" d="M0,288L48,272C96,256,192,224,288,213.3C384,203,480,213,576,229.3C672,245,768,267,864,261.3C960,256,1056,224,1152,213.3C1248,203,1344,213,1392,218.7L1440,224V320H0Z"/>
+      <path fill="rgba(255,255,255,0.08)" d="M0,256L48,261.3C96,267,192,277,288,277.3C384,277,480,267,576,250.7C672,235,768,213,864,213.3C960,213,1056,235,1152,245.3C1248,256,1344,256,1392,256L1440,256V320H0Z"/>
+    </svg>
+  </div>
+  <div class="login-card">
+    <h2>Welcome Back!</h2>
+    <p class="login-subtitle">UoK Faculty of Science - Year 2 Results</p>
+    <form onsubmit="handleLogin(event)">
+      <div class="login-field">
+        <input type="text" id="loginId" placeholder="Student ID (e.g. EC/2023/001)" autocomplete="off" autofocus>
+        <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <button type="submit" class="login-btn">VIEW RESULTS</button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+    <div class="login-footer">University of Kelaniya &copy; 2025</div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="dashboard" id="dashboard">
 <div class="install-banner" id="installBanner" onclick="installPWA()">
   Install this app on your device for quick access
 </div>
-<div class="header">
+<div class="header" style="position:relative;">
   <h1>UoK Science Results</h1>
-  <p>Faculty of Science - Year 1 (2023/2024)</p>
+  <p>Faculty of Science - Year 2 (2023/2024)</p>
   <p class="meta">Updated: {timestamp} | Auto-scraped every 3 hours</p>
+  <button class="logout-btn" onclick="handleLogout()">Logout</button>
 </div>
 <div class="container">
   <div class="summary-bar">
@@ -455,6 +565,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxyg
     Pending
   </div>
 </div>
+</div><!-- end dashboard -->
 
 <script>
 var DATA = {data_json};
@@ -597,6 +708,66 @@ if ('serviceWorker' in navigator) {{
 
 render();
 </script>
+
+<!-- ===== LOGIN SCRIPT ===== -->
+<script>
+var VALID_IDS = {valid_ids_json};
+
+function checkAuth() {{
+  var user = localStorage.getItem('uok_user');
+  if (user) {{
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('dashboard').classList.add('visible');
+    return true;
+  }}
+  return false;
+}}
+
+function handleLogin(e) {{
+  e.preventDefault();
+  var input = document.getElementById('loginId').value.trim().toUpperCase();
+  var errorEl = document.getElementById('loginError');
+
+  if (!input) {{
+    errorEl.textContent = 'Please enter your Student ID';
+    return;
+  }}
+
+  // Normalize: accept formats like EC2023001, EC/2023/001, ec/2023/001
+  var normalized = input.replace(/[^A-Z0-9]/g, '');
+  var match = normalized.match(/^EC(\\d{{4}})(\\d{{3}})$/);
+  if (match) {{
+    input = 'EC/' + match[1] + '/' + match[2];
+  }}
+
+  if (VALID_IDS.indexOf(input) === -1) {{
+    errorEl.textContent = 'Student ID not found. Please check and try again.';
+    document.getElementById('loginId').style.borderColor = '#e53935';
+    setTimeout(function() {{
+      document.getElementById('loginId').style.borderColor = '';
+    }}, 2000);
+    return;
+  }}
+
+  localStorage.setItem('uok_user', input);
+  errorEl.textContent = '';
+  document.getElementById('loginPage').classList.add('hidden');
+  setTimeout(function() {{
+    document.getElementById('dashboard').classList.add('visible');
+  }}, 400);
+}}
+
+function handleLogout() {{
+  localStorage.removeItem('uok_user');
+  document.getElementById('dashboard').classList.remove('visible');
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('loginId').value = '';
+  document.getElementById('loginError').textContent = '';
+}}
+
+// Auto-login if already authenticated
+checkAuth();
+</script>
 </body>
 </html>"""
     return html
@@ -628,7 +799,8 @@ def main():
     newly_available, gpa_changes = detect_changes(old_results, new_results)
     has_changes = len(newly_available) > 0 or len(gpa_changes) > 0
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    ist = timezone(timedelta(hours=5, minutes=30))
+    timestamp = datetime.now(ist).strftime("%Y-%m-%d %H:%M IST")
 
     if has_changes:
         logger.info(f"Changes detected: {len(newly_available)} new, {len(gpa_changes)} changed")

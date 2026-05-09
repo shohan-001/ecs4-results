@@ -1,7 +1,7 @@
 [
   {
     "student_id": "EC/2022/080",
-    "error": "HTTPConnectionPool(host='www.science.kln.ac.lk', port=8080): Read timed out. (read timeout=60)"
+    "error": "Could not find Year 1 Registration link"
   },
   {
     "student_id": "EC/2023/001",
@@ -1177,13 +1177,176 @@
   },
   {
     "student_id": "EC/2023/010",
-    "name_initial": "",
-    "full_name": "",
-    "academic_year": "",
-    "courses": [],
-    "total_credit": "",
+    "name_initial": "Mr A.R.J. CROOS",
+    "full_name": "Mr ANTON REX JOSIYAN CROOS",
+    "academic_year": "2023/2024",
+    "courses": [
+      {
+        "Course Code": "Course CodeCourse NameAcYearAttemptExamStatusExam NoteGradeACLT 110132023/20241BECS 112122023/20241B+BECS 112232023/20241ABECS 114132023/20241A-BECS 114222023/20241B+BECS 114312023/20241B+BECS 116132023/20241BBECS 117222023/20241B+BECS 122332023/20241CBECS 122432023/20241BECS 124432023/20241BECS 124512023/20241BECS 124622023/20241B+BECS 126232023/20241B-BECS 127122023/20241BECS 127422023/20241CMSK 140122023/20241",
+        "Course Name": "ACLT 11013",
+        "AcYear": "",
+        "Attempt": "2023/2024",
+        "ExamStatus": "1",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "ACLT 11013",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 11212",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 11223",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "A"
+      },
+      {
+        "Course Code": "BECS 11413",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "A-"
+      },
+      {
+        "Course Code": "BECS 11422",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 11431",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 11613",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B"
+      },
+      {
+        "Course Code": "BECS 11722",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 12233",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "C"
+      },
+      {
+        "Course Code": "BECS 12243",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 12443",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 12451",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 12462",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 12623",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B-"
+      },
+      {
+        "Course Code": "BECS 12712",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 12742",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "CMSK 14012",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      }
+    ],
+    "total_credit": "40",
     "non_gpa_credit": "",
-    "gpa": "",
+    "gpa": "2.170000",
     "error": null
   },
   {
@@ -3378,13 +3541,167 @@
   },
   {
     "student_id": "EC/2023/027",
-    "name_initial": "",
-    "full_name": "",
-    "academic_year": "",
-    "courses": [],
-    "total_credit": "",
+    "name_initial": "Mr E.M.U.C. BANDARA",
+    "full_name": "Mr EDIRISINGHE MUDIYANSELAGE UDARA CHARUKA BANDARA",
+    "academic_year": "2023/2024",
+    "courses": [
+      {
+        "Course Code": "Course CodeCourse NameAcYearAttemptExamStatusExam NoteGradeACLT 110132023/20241BECS 112122023/20241ABECS 112232023/20241ABECS 114132023/20241B+BECS 114222023/20241B+BECS 114312023/20241B+BECS 116132023/20241B+BECS 117222023/20241ABECS 122332023/20241B+BECS 122432023/20241BECS 124432023/20241BECS 124512023/20241BECS 124622023/20241B-BECS 126232023/20241B+BECS 127122023/20241BECS 127422023/20241",
+        "Course Name": "ACLT 11013",
+        "AcYear": "",
+        "Attempt": "2023/2024",
+        "ExamStatus": "1",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "ACLT 11013",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 11212",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "A"
+      },
+      {
+        "Course Code": "BECS 11223",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "A"
+      },
+      {
+        "Course Code": "BECS 11413",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 11422",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 11431",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 11613",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 11722",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "A"
+      },
+      {
+        "Course Code": "BECS 12233",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 12243",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 12443",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 12451",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 12462",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B-"
+      },
+      {
+        "Course Code": "BECS 12623",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": "B+"
+      },
+      {
+        "Course Code": "BECS 12712",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      },
+      {
+        "Course Code": "BECS 12742",
+        "Course Name": "",
+        "AcYear": "2023/2024",
+        "Attempt": "1",
+        "ExamStatus": "",
+        "Exam Note": "",
+        "Grade": ""
+      }
+    ],
+    "total_credit": "38",
     "non_gpa_credit": "",
-    "gpa": "",
+    "gpa": "2.370000",
     "error": null
   },
   {
@@ -7579,167 +7896,13 @@
   },
   {
     "student_id": "EC/2023/061",
-    "name_initial": "Ms K.K. MALHARI",
-    "full_name": "Ms KUDAVIDANAGE KAVEESHA MALHARI",
-    "academic_year": "2023/2024",
-    "courses": [
-      {
-        "Course Code": "Course CodeCourse NameAcYearAttemptExamStatusExam NoteGradeACLT 110132023/20241BECS 112122023/20241BBECS 112232023/20241ABECS 114132023/20241ABECS 114222023/20241B+BECS 114312023/20241C+BECS 116132023/20241ABECS 117222023/20241ABECS 122332023/20241ABECS 122432023/20241BECS 124432023/20241BECS 124512023/20241BECS 124622023/20241ABECS 126232023/20241B+BECS 127122023/20241BECS 127422023/20241",
-        "Course Name": "ACLT 11013",
-        "AcYear": "",
-        "Attempt": "2023/2024",
-        "ExamStatus": "1",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "ACLT 11013",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 11212",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B"
-      },
-      {
-        "Course Code": "BECS 11223",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 11413",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 11422",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B+"
-      },
-      {
-        "Course Code": "BECS 11431",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "C+"
-      },
-      {
-        "Course Code": "BECS 11613",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 11722",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 12233",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 12243",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12443",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12451",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12462",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 12623",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B+"
-      },
-      {
-        "Course Code": "BECS 12712",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12742",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      }
-    ],
-    "total_credit": "38",
+    "name_initial": "",
+    "full_name": "",
+    "academic_year": "",
+    "courses": [],
+    "total_credit": "",
     "non_gpa_credit": "",
-    "gpa": "2.540000",
+    "gpa": "",
     "error": null
   },
   {
@@ -8096,7 +8259,7 @@
   },
   {
     "student_id": "EC/2023/066",
-    "error": "Could not find Year 1 Registration link"
+    "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
   },
   {
     "student_id": "EC/2023/068",
@@ -8265,168 +8428,7 @@
   },
   {
     "student_id": "EC/2023/069",
-    "name_initial": "Ms J.A.U. SUBHASHINI",
-    "full_name": "Ms JASIN ARACHCHIGE UPEKSHA SUBHASHINI",
-    "academic_year": "2023/2024",
-    "courses": [
-      {
-        "Course Code": "Course CodeCourse NameAcYearAttemptExamStatusExam NoteGradeACLT 110132023/20241BECS 112122023/20241ABECS 112232023/20241ABECS 114132023/20241ABECS 114222023/20241B+BECS 114312023/20241B+BECS 116132023/20241ABECS 117222023/20241B+BECS 122332023/20241A+BECS 122432023/20241BECS 124432023/20241BECS 124512023/20241BECS 124622023/20241A-BECS 126232023/20241ABECS 127122023/20241BECS 127422023/20241",
-        "Course Name": "ACLT 11013",
-        "AcYear": "",
-        "Attempt": "2023/2024",
-        "ExamStatus": "1",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "ACLT 11013",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 11212",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 11223",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 11413",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 11422",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B+"
-      },
-      {
-        "Course Code": "BECS 11431",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B+"
-      },
-      {
-        "Course Code": "BECS 11613",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 11722",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B+"
-      },
-      {
-        "Course Code": "BECS 12233",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A+"
-      },
-      {
-        "Course Code": "BECS 12243",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12443",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12451",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12462",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A-"
-      },
-      {
-        "Course Code": "BECS 12623",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 12712",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12742",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      }
-    ],
-    "total_credit": "38",
-    "non_gpa_credit": "",
-    "gpa": "2.630000",
-    "error": null
+    "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
   },
   {
     "student_id": "EC/2023/070",
@@ -8438,168 +8440,7 @@
   },
   {
     "student_id": "EC/2023/072",
-    "name_initial": "Mr K.D.C. GETHANJANA",
-    "full_name": "Mr KALUARACHCHILAGE DILEKA CHAMOD GEETHANJANA",
-    "academic_year": "2023/2024",
-    "courses": [
-      {
-        "Course Code": "Course CodeCourse NameAcYearAttemptExamStatusExam NoteGradeACLT 110132023/20241BECS 112122023/20241A-BECS 112232023/20241BBECS 114132023/20241A-BECS 114222023/20241A+BECS 114312023/20241B+BECS 116132023/20241A-BECS 117222023/20241B+BECS 122332023/20241CBECS 122432023/20241BECS 124432023/20241BECS 124512023/20241BECS 124622023/20241ABECS 126232023/20241BBECS 127122023/20241BECS 127422023/20241",
-        "Course Name": "ACLT 11013",
-        "AcYear": "",
-        "Attempt": "2023/2024",
-        "ExamStatus": "1",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "ACLT 11013",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 11212",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A-"
-      },
-      {
-        "Course Code": "BECS 11223",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B"
-      },
-      {
-        "Course Code": "BECS 11413",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A-"
-      },
-      {
-        "Course Code": "BECS 11422",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A+"
-      },
-      {
-        "Course Code": "BECS 11431",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B+"
-      },
-      {
-        "Course Code": "BECS 11613",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A-"
-      },
-      {
-        "Course Code": "BECS 11722",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B+"
-      },
-      {
-        "Course Code": "BECS 12233",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "C"
-      },
-      {
-        "Course Code": "BECS 12243",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12443",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12451",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12462",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 12623",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B"
-      },
-      {
-        "Course Code": "BECS 12712",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12742",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      }
-    ],
-    "total_credit": "38",
-    "non_gpa_credit": "",
-    "gpa": "2.270000",
-    "error": null
+    "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
   },
   {
     "student_id": "EC/2023/077",
@@ -9437,167 +9278,13 @@
   },
   {
     "student_id": "EC/2023/082",
-    "name_initial": "Ms S.B.A.S. NIDARSHANA",
-    "full_name": "Ms SOORIYA BANDARA ARACHCHILAGE SAKUNI NIDARSHANA",
-    "academic_year": "2023/2024",
-    "courses": [
-      {
-        "Course Code": "Course CodeCourse NameAcYearAttemptExamStatusExam NoteGradeACLT 110132023/20241BECS 112122023/20241ABECS 112232023/20241B-BECS 114132023/20241BBECS 114222023/20241CBECS 114312023/20241C+BECS 116132023/20241B-BECS 117222023/20241ABECS 122332023/20241A-BECS 122432023/20241BECS 124432023/20241BECS 124512023/20241BECS 124622023/20241ABECS 126232023/20241B-BECS 127122023/20241BECS 127422023/20241",
-        "Course Name": "ACLT 11013",
-        "AcYear": "",
-        "Attempt": "2023/2024",
-        "ExamStatus": "1",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "ACLT 11013",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 11212",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 11223",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B-"
-      },
-      {
-        "Course Code": "BECS 11413",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B"
-      },
-      {
-        "Course Code": "BECS 11422",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "C"
-      },
-      {
-        "Course Code": "BECS 11431",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "C+"
-      },
-      {
-        "Course Code": "BECS 11613",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B-"
-      },
-      {
-        "Course Code": "BECS 11722",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 12233",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A-"
-      },
-      {
-        "Course Code": "BECS 12243",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12443",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12451",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12462",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "A"
-      },
-      {
-        "Course Code": "BECS 12623",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": "B-"
-      },
-      {
-        "Course Code": "BECS 12712",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      },
-      {
-        "Course Code": "BECS 12742",
-        "Course Name": "",
-        "AcYear": "2023/2024",
-        "Attempt": "1",
-        "ExamStatus": "",
-        "Exam Note": "",
-        "Grade": ""
-      }
-    ],
-    "total_credit": "38",
+    "name_initial": "",
+    "full_name": "",
+    "academic_year": "",
+    "courses": [],
+    "total_credit": "",
     "non_gpa_credit": "",
-    "gpa": "2.130000",
+    "gpa": "",
     "error": null
   },
   {

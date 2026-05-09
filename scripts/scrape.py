@@ -309,7 +309,7 @@ def build_notification_message(newly_available, gpa_changes, timestamp):
 
 
 def generate_html(results, timestamp):
-    """Generate the index.html with embedded results data."""
+    """Generate the index.html as a PWA with embedded results data."""
     results.sort(key=lambda x: x.get("student_id", ""))
 
     data_json = json.dumps(results)
@@ -325,94 +325,141 @@ def generate_html(results, timestamp):
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Faculty of Science - Student Results</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a73e8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UoK Results">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<title>UoK Science Results</title>
 <style>
 * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; }}
-.header {{ background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; padding: 24px; text-align: center; }}
-.header h1 {{ font-size: 1.6em; margin-bottom: 4px; }}
-.header p {{ opacity: 0.9; font-size: 0.95em; }}
-.header .meta {{ font-size: 0.8em; opacity: 0.75; margin-top: 8px; }}
-.container {{ max-width: 1200px; margin: 20px auto; padding: 0 16px; }}
-.summary-bar {{ display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }}
-.summary-card {{ background: white; border-radius: 8px; padding: 14px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex: 1; min-width: 120px; text-align: center; }}
-.summary-card .num {{ font-size: 1.8em; font-weight: 700; }}
-.summary-card .label {{ font-size: 0.78em; color: #666; margin-top: 2px; }}
+body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif; background: #f0f2f5; color: #333; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }}
+.header {{ background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; padding: 20px 16px; text-align: center; position: sticky; top: 0; z-index: 100; }}
+.header h1 {{ font-size: 1.3em; margin-bottom: 2px; }}
+.header p {{ opacity: 0.9; font-size: 0.85em; }}
+.header .meta {{ font-size: 0.72em; opacity: 0.75; margin-top: 6px; }}
+.install-banner {{ display: none; background: #e8f0fe; border-bottom: 1px solid #c2d7f2; padding: 10px 16px; text-align: center; font-size: 0.85em; color: #1a73e8; cursor: pointer; }}
+.install-banner:hover {{ background: #d2e3fc; }}
+.install-banner.show {{ display: block; }}
+.container {{ max-width: 1200px; margin: 0 auto; padding: 12px 12px 80px; }}
+.summary-bar {{ display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }}
+.summary-card {{ background: white; border-radius: 10px; padding: 12px 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); text-align: center; }}
+.summary-card .num {{ font-size: 1.5em; font-weight: 700; }}
+.summary-card .label {{ font-size: 0.65em; color: #666; margin-top: 2px; }}
 .blue {{ color: #1a73e8; }}
 .green {{ color: #2e7d32; }}
 .red {{ color: #c62828; }}
-.search-bar {{ margin-bottom: 20px; display: flex; gap: 10px; }}
-.search-bar input {{ flex: 1; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 1em; outline: none; }}
+.search-bar {{ margin-bottom: 14px; display: flex; gap: 8px; position: sticky; top: 82px; z-index: 90; background: #f0f2f5; padding: 6px 0; }}
+.search-bar input {{ flex: 1; padding: 11px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.95em; outline: none; background: white; }}
 .search-bar input:focus {{ border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }}
-.sort-btn {{ padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-size: 0.9em; white-space: nowrap; }}
+.sort-btn {{ padding: 11px 14px; border: 1px solid #ddd; border-radius: 10px; background: white; cursor: pointer; font-size: 0.85em; white-space: nowrap; }}
 .sort-btn:hover {{ background: #f0f2f5; }}
 .sort-btn.active {{ background: #1a73e8; color: white; border-color: #1a73e8; }}
-.student-card {{ background: white; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }}
-.student-header {{ display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; cursor: pointer; user-select: none; }}
-.student-header:hover {{ background: #f8f9fa; }}
-.student-info {{ flex: 1; }}
-.student-id {{ font-weight: 700; color: #1a73e8; font-size: 1em; }}
-.student-name {{ color: #555; font-size: 0.85em; margin-top: 1px; }}
-.student-gpa {{ text-align: right; }}
-.gpa-value {{ font-size: 1.4em; font-weight: 700; }}
-.gpa-label {{ font-size: 0.7em; color: #888; }}
+.student-card {{ background: white; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: hidden; }}
+.student-header {{ display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; cursor: pointer; user-select: none; -webkit-user-select: none; }}
+.student-header:active {{ background: #f0f2f5; }}
+.student-info {{ flex: 1; min-width: 0; }}
+.student-id {{ font-weight: 700; color: #1a73e8; font-size: 0.92em; }}
+.student-name {{ color: #555; font-size: 0.8em; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.student-gpa {{ text-align: right; flex-shrink: 0; margin-left: 8px; }}
+.gpa-value {{ font-size: 1.3em; font-weight: 700; }}
+.gpa-label {{ font-size: 0.65em; color: #888; }}
 .gpa-high {{ color: #2e7d32; }}
 .gpa-mid {{ color: #f57f17; }}
 .gpa-low {{ color: #c62828; }}
-.student-details {{ display: none; padding: 0 18px 14px; border-top: 1px solid #eee; }}
+.student-details {{ display: none; padding: 0 14px 12px; border-top: 1px solid #eee; }}
 .student-details.open {{ display: block; }}
-.course-table {{ width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }}
-.course-table th {{ background: #f0f2f5; padding: 7px 8px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; }}
-.course-table td {{ padding: 6px 8px; border-bottom: 1px solid #eee; }}
-.course-table tr:hover td {{ background: #f8f9fa; }}
+.course-table {{ width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.78em; }}
+.course-table th {{ background: #f0f2f5; padding: 6px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; }}
+.course-table td {{ padding: 5px 6px; border-bottom: 1px solid #eee; }}
+.course-table tr:active td {{ background: #f0f2f5; }}
 .grade-a {{ color: #2e7d32; font-weight: 600; }}
 .grade-b {{ color: #1565c0; font-weight: 600; }}
 .grade-c {{ color: #f57f17; font-weight: 600; }}
 .grade-d {{ color: #e65100; font-weight: 600; }}
 .grade-fail {{ color: #c62828; font-weight: 600; }}
-.no-results {{ background: white; border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #999; }}
+.no-results {{ background: white; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); color: #999; font-size: 0.9em; }}
 .no-results .student-id {{ color: #c62828; }}
-.toggle-icon {{ font-size: 1.1em; color: #999; margin-left: 10px; transition: transform 0.2s; }}
+.toggle-icon {{ font-size: 1em; color: #999; margin-left: 8px; transition: transform 0.2s; flex-shrink: 0; }}
 .toggle-icon.open {{ transform: rotate(90deg); }}
 .absent {{ color: #c62828; font-style: italic; }}
-.detail-meta {{ margin-bottom: 8px; color: #666; font-size: 0.82em; }}
-.count-badge {{ display: inline-block; background: #e8eaf6; color: #3f51b5; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-left: 4px; }}
+.detail-meta {{ margin-bottom: 6px; color: #666; font-size: 0.78em; line-height: 1.4; }}
+.count-badge {{ display: inline-block; background: #e8eaf6; color: #3f51b5; padding: 1px 6px; border-radius: 10px; font-size: 0.75em; margin-left: 4px; }}
+.tab-bar {{ position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e0e0e0; display: flex; padding: 6px 0; padding-bottom: max(6px, env(safe-area-inset-bottom)); z-index: 100; }}
+.tab {{ flex: 1; text-align: center; padding: 4px 0; font-size: 0.7em; color: #666; cursor: pointer; }}
+.tab.active {{ color: #1a73e8; font-weight: 600; }}
+.tab svg {{ display: block; margin: 0 auto 2px; }}
+@media (min-width: 601px) {{
+  .header h1 {{ font-size: 1.6em; }}
+  .summary-card .num {{ font-size: 1.8em; }}
+  .summary-card .label {{ font-size: 0.78em; }}
+  .student-header {{ padding: 14px 18px; }}
+  .container {{ padding: 16px 16px 24px; }}
+  .tab-bar {{ display: none; }}
+  .container {{ padding-bottom: 24px; }}
+  .search-bar {{ top: 90px; }}
+}}
 @media (max-width: 600px) {{
-  .summary-bar {{ flex-direction: column; }}
-  .student-header {{ flex-direction: column; align-items: flex-start; gap: 6px; }}
-  .student-gpa {{ text-align: left; }}
-  .course-table {{ font-size: 0.75em; }}
-  .search-bar {{ flex-direction: column; }}
+  .summary-bar {{ grid-template-columns: repeat(3, 1fr); }}
+  .summary-bar .summary-card:nth-child(4),
+  .summary-bar .summary-card:nth-child(5) {{ grid-column: span 1; }}
+  .course-table {{ font-size: 0.7em; }}
+  .course-table th:nth-child(2), .course-table td:nth-child(2),
+  .course-table th:nth-child(3), .course-table td:nth-child(3),
+  .course-table th:nth-child(5), .course-table td:nth-child(5) {{ display: none; }}
+}}
+@media (max-width: 400px) {{
+  .summary-bar {{ grid-template-columns: repeat(2, 1fr); }}
 }}
 </style>
 </head>
 <body>
+<div class="install-banner" id="installBanner" onclick="installPWA()">
+  Install this app on your device for quick access
+</div>
 <div class="header">
-  <h1>University of Kelaniya - Faculty of Science</h1>
-  <p>First Year Exam Results (2023/2024)</p>
-  <p class="meta">Last updated: {timestamp} | Auto-scraped every 6 hours</p>
+  <h1>UoK Science Results</h1>
+  <p>Faculty of Science - Year 1 (2023/2024)</p>
+  <p class="meta">Updated: {timestamp} | Auto-scraped every 3 hours</p>
 </div>
 <div class="container">
   <div class="summary-bar">
-    <div class="summary-card"><div class="num blue">{len(results)}</div><div class="label">Total Students</div></div>
-    <div class="summary-card"><div class="num green">{len(success)}</div><div class="label">Results Available</div></div>
-    <div class="summary-card"><div class="num blue">{avg_gpa:.2f}</div><div class="label">Average GPA</div></div>
-    <div class="summary-card"><div class="num green">{max_gpa:.2f}</div><div class="label">Highest GPA</div></div>
-    <div class="summary-card"><div class="num red">{min_gpa:.2f}</div><div class="label">Lowest GPA</div></div>
+    <div class="summary-card"><div class="num blue">{len(results)}</div><div class="label">Total</div></div>
+    <div class="summary-card"><div class="num green">{len(success)}</div><div class="label">Results</div></div>
+    <div class="summary-card"><div class="num red">{len(failed)}</div><div class="label">Pending</div></div>
+    <div class="summary-card"><div class="num blue">{avg_gpa:.2f}</div><div class="label">Avg GPA</div></div>
+    <div class="summary-card"><div class="num green">{max_gpa:.2f}</div><div class="label">Top GPA</div></div>
   </div>
 
   <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search by student ID, name, or course code..." oninput="render()">
-    <button class="sort-btn" id="sortBtn" onclick="toggleSort()">Sort: Default</button>
+    <input type="text" id="searchInput" placeholder="Search ID, name, or course..." oninput="render()">
+    <button class="sort-btn" id="sortBtn" onclick="toggleSort()">Sort</button>
   </div>
 
   <div id="studentList"></div>
 </div>
 
+<div class="tab-bar">
+  <div class="tab active" onclick="showAll()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    All
+  </div>
+  <div class="tab" onclick="showResults()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    Results
+  </div>
+  <div class="tab" onclick="showPending()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Pending
+  </div>
+</div>
+
 <script>
 var DATA = {data_json};
 var sortMode = 'default';
+var filterMode = 'all';
 var expanded = {{}};
 
 function gradeClass(g) {{
@@ -441,18 +488,31 @@ function toggleDetails(id) {{
 
 function toggleSort() {{
   var modes = ['default', 'gpa-desc', 'gpa-asc', 'name'];
-  var labels = ['Default', 'GPA High-Low', 'GPA Low-High', 'Name A-Z'];
+  var labels = ['Default', 'GPA ↓', 'GPA ↑', 'Name'];
   var idx = modes.indexOf(sortMode);
   idx = (idx + 1) % modes.length;
   sortMode = modes[idx];
-  document.getElementById('sortBtn').textContent = 'Sort: ' + labels[idx];
+  document.getElementById('sortBtn').textContent = labels[idx];
   document.getElementById('sortBtn').className = sortMode === 'default' ? 'sort-btn' : 'sort-btn active';
   render();
 }}
 
+function setTab(mode) {{
+  filterMode = mode;
+  document.querySelectorAll('.tab').forEach(function(t, i) {{
+    t.className = 'tab' + (['all','results','pending'][i] === mode ? ' active' : '');
+  }});
+  render();
+}}
+function showAll() {{ setTab('all'); }}
+function showResults() {{ setTab('results'); }}
+function showPending() {{ setTab('pending'); }}
+
 function render() {{
   var query = document.getElementById('searchInput').value.toLowerCase();
   var filtered = DATA.filter(function(s) {{
+    if (filterMode === 'results' && s.error) return false;
+    if (filterMode === 'pending' && !s.error) return false;
     if (!query) return true;
     var text = (s.student_id + ' ' + (s.name_initial||'') + ' ' + (s.full_name||'')).toLowerCase();
     if (text.indexOf(query) >= 0) return true;
@@ -489,8 +549,8 @@ function render() {{
 
     if (isOpen) {{
       html += '<div class="student-details open">';
-      html += '<p class="detail-meta"><strong>Full Name:</strong> ' + (s.full_name||'') + ' | <strong>Credits:</strong> ' + (s.total_credit||'') + ' | <strong>Non-GPA:</strong> ' + (s.non_gpa_credit||'') + '</p>';
-      html += '<table class="course-table"><thead><tr><th>Course Code</th><th>Ac Year</th><th>Attempt</th><th>Exam Status</th><th>Exam Note</th><th>Grade</th></tr></thead><tbody>';
+      html += '<p class="detail-meta"><strong>Name:</strong> ' + (s.full_name||'') + '<br><strong>Credits:</strong> ' + (s.total_credit||'N/A') + ' | <strong>Non-GPA:</strong> ' + (s.non_gpa_credit||'N/A') + '</p>';
+      html += '<table class="course-table"><thead><tr><th>Course</th><th>Year</th><th>Att</th><th>Status</th><th>Note</th><th>Grade</th></tr></thead><tbody>';
       (s.courses||[]).forEach(function(c) {{
         var code = c['Course Code'] || c['CourseCode'] || '';
         if (code.startsWith('Course Code')) return;
@@ -510,6 +570,29 @@ function render() {{
   }}
 
   document.getElementById('studentList').innerHTML = html;
+}}
+
+// PWA Install
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e) {{
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+}});
+
+function installPWA() {{
+  if (deferredPrompt) {{
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() {{
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.remove('show');
+    }});
+  }}
+}}
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {{
+  navigator.serviceWorker.register('/sw.js').catch(function() {{}});
 }}
 
 render();

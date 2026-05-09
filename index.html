@@ -17,40 +17,121 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxyge
 /* ===== LOGIN PAGE ===== */
 .login-page {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
-  background: linear-gradient(180deg, #e0f7f1 0%, #b2dfdb 40%, #80cbc4 70%, #4db6ac 100%);
+  background: linear-gradient(180deg, #0a2a3c 0%, #0d3d56 25%, #0f4c63 45%, #0e6b6e 65%, #1a8a7a 85%, #2bb5a0 100%);
+  background-size: 100% 200%;
+  animation: oceanGradient 8s ease infinite;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+@keyframes oceanGradient {
+  0%, 100% { background-position: 0% 0%; }
+  50% { background-position: 0% 100%; }
 }
 .login-page.hidden {
   opacity: 0; transform: scale(1.05); pointer-events: none;
 }
-.login-waves {
-  position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
+
+/* --- Animated Ocean Waves --- */
+.ocean-waves {
+  position: absolute; bottom: 0; left: 0; width: 200%; height: 45%;
+  pointer-events: none;
 }
-.login-waves svg { width: 100%; height: 100%; display: block; }
+.ocean-waves .wave {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+}
+.ocean-waves .wave svg {
+  width: 100%; height: 100%; display: block;
+}
+.ocean-waves .wave-1 { animation: waveSlide 7s linear infinite; opacity: 0.6; }
+.ocean-waves .wave-2 { animation: waveSlide 11s linear infinite reverse; opacity: 0.4; bottom: -8px; }
+.ocean-waves .wave-3 { animation: waveSlide 9s linear infinite; opacity: 0.25; bottom: -16px; }
+.ocean-waves .wave-4 { animation: waveSlide 14s linear infinite reverse; opacity: 0.15; bottom: -24px; }
+@keyframes waveSlide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* --- Floating Bubbles --- */
+.bubbles {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; overflow: hidden;
+}
+.bubble {
+  position: absolute; bottom: -20px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.1);
+  animation: bubbleRise linear infinite;
+}
+@keyframes bubbleRise {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-100vh) scale(0.4); opacity: 0; }
+}
+
+/* --- Login Card --- */
 .login-card {
-  background: white; border-radius: 20px; padding: 40px 36px; width: 90%; max-width: 400px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 4px 20px rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 44px 36px; width: 90%; max-width: 400px;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.25), 0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
   text-align: center; position: relative; z-index: 2;
-  animation: loginSlideUp 0.6s ease-out;
+  animation: loginSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255,255,255,0.3);
 }
 @keyframes loginSlideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(40px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* --- Animated Welcome Text --- */
 .login-card h2 {
-  color: #00897b; font-size: 1.7em; margin-bottom: 6px; font-weight: 700;
+  font-size: 1.9em; margin-bottom: 6px; font-weight: 800;
+  background: linear-gradient(90deg, #00897b, #26a69a, #4dd0e1, #00897b, #26a69a);
+  background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerText 3s linear infinite;
+}
+@keyframes shimmerText {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+.login-card .login-wave-emoji {
+  display: inline-block; animation: waveHand 1.8s ease-in-out infinite;
+  transform-origin: 70% 70%; font-size: 1.1em;
+}
+@keyframes waveHand {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(14deg); }
+  30% { transform: rotate(-8deg); }
+  45% { transform: rotate(14deg); }
+  60% { transform: rotate(-4deg); }
+  75% { transform: rotate(10deg); }
 }
 .login-card .login-subtitle {
   color: #78909c; font-size: 0.85em; margin-bottom: 28px;
+  animation: fadeInDelay 1s ease 0.3s both;
 }
+@keyframes fadeInDelay {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Login Fields --- */
 .login-field {
   position: relative; margin-bottom: 16px;
+  animation: fieldSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.login-field:nth-child(1) { animation-delay: 0.4s; }
+.login-field:nth-child(2) { animation-delay: 0.55s; }
+@keyframes fieldSlideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 .login-field input {
   width: 100%; padding: 14px 16px 14px 46px; border: 2px solid #e0e0e0; border-radius: 50px;
-  font-size: 0.95em; outline: none; background: #fafafa; color: #333;
+  font-size: 0.95em; outline: none; background: rgba(250,250,250,0.8); color: #333;
   transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
 }
 .login-field input:focus {
@@ -62,22 +143,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxyge
   color: #90a4ae; transition: color 0.3s;
 }
 .login-field input:focus ~ .field-icon { color: #26a69a; }
+.login-field .toggle-pwd {
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  color: #90a4ae; cursor: pointer; background: none; border: none; padding: 4px;
+  display: flex; align-items: center; transition: color 0.3s;
+}
+.login-field .toggle-pwd:hover { color: #26a69a; }
+
+/* --- Login Button --- */
 .login-btn {
   width: 100%; padding: 14px; border: none; border-radius: 50px;
-  background: linear-gradient(135deg, #26a69a, #00897b);
+  background: linear-gradient(135deg, #26a69a, #00897b, #00695c);
+  background-size: 200% auto;
   color: white; font-size: 1em; font-weight: 600; letter-spacing: 1px;
   cursor: pointer; margin-top: 8px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 15px rgba(38,166,154,0.35);
+  transition: transform 0.2s, box-shadow 0.2s, background-position 0.4s;
+  box-shadow: 0 4px 18px rgba(38,166,154,0.4);
+  animation: fieldSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
 }
-.login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(38,166,154,0.45); }
+.login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(38,166,154,0.5); background-position: right center; }
 .login-btn:active { transform: translateY(0); }
 .login-error {
   color: #e53935; font-size: 0.82em; margin-top: 10px; min-height: 20px;
   transition: opacity 0.3s;
 }
+.login-hint {
+  margin-top: 14px; color: #b0bec5; font-size: 0.72em; font-style: italic;
+}
 .login-footer {
-  margin-top: 24px; color: #b0bec5; font-size: 0.75em;
+  margin-top: 20px; color: #b0bec5; font-size: 0.75em;
 }
 .login-footer a { color: #26a69a; text-decoration: none; }
 
@@ -175,20 +269,58 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxyge
 
 <!-- ===== LOGIN PAGE ===== -->
 <div class="login-page" id="loginPage">
-  <div class="login-waves">
-    <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path fill="rgba(255,255,255,0.18)" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,213.3C672,224,768,224,864,208C960,192,1056,160,1152,154.7C1248,149,1344,171,1392,181.3L1440,192V320H0Z"/>
-      <path fill="rgba(255,255,255,0.12)" d="M0,288L48,272C96,256,192,224,288,213.3C384,203,480,213,576,229.3C672,245,768,267,864,261.3C960,256,1056,224,1152,213.3C1248,203,1344,213,1392,218.7L1440,224V320H0Z"/>
-      <path fill="rgba(255,255,255,0.08)" d="M0,256L48,261.3C96,267,192,277,288,277.3C384,277,480,267,576,250.7C672,235,768,213,864,213.3C960,213,1056,235,1152,245.3C1248,256,1344,256,1392,256L1440,256V320H0Z"/>
-    </svg>
+  <!-- Animated Ocean Waves -->
+  <div class="ocean-waves">
+    <div class="wave wave-1">
+      <svg viewBox="0 0 2880 320" preserveAspectRatio="none">
+        <path fill="rgba(255,255,255,0.2)" d="M0,160L60,170.7C120,181,240,203,360,213.3C480,224,600,224,720,208C840,192,960,160,1080,154.7C1200,149,1320,171,1440,181.3C1560,192,1680,192,1800,186.7C1920,181,2040,171,2160,176C2280,181,2400,203,2520,208C2640,213,2760,203,2820,197.3L2880,192V320H0Z"/>
+      </svg>
+    </div>
+    <div class="wave wave-2">
+      <svg viewBox="0 0 2880 320" preserveAspectRatio="none">
+        <path fill="rgba(255,255,255,0.15)" d="M0,224L60,213.3C120,203,240,181,360,186.7C480,192,600,224,720,234.7C840,245,960,235,1080,218.7C1200,203,1320,181,1440,186.7C1560,192,1680,224,1800,229.3C1920,235,2040,213,2160,202.7C2280,192,2400,192,2520,197.3C2640,203,2760,213,2820,218.7L2880,224V320H0Z"/>
+      </svg>
+    </div>
+    <div class="wave wave-3">
+      <svg viewBox="0 0 2880 320" preserveAspectRatio="none">
+        <path fill="rgba(255,255,255,0.1)" d="M0,256L60,250.7C120,245,240,235,360,229.3C480,224,600,224,720,234.7C840,245,960,267,1080,261.3C1200,256,1320,224,1440,218.7C1560,213,1680,235,1800,245.3C1920,256,2040,256,2160,250.7C2280,245,2400,235,2520,234.7C2640,235,2760,245,2820,250.7L2880,256V320H0Z"/>
+      </svg>
+    </div>
+    <div class="wave wave-4">
+      <svg viewBox="0 0 2880 320" preserveAspectRatio="none">
+        <path fill="rgba(38,166,154,0.12)" d="M0,288L60,282.7C120,277,240,267,360,261.3C480,256,600,256,720,261.3C840,267,960,277,1080,272C1200,267,1320,245,1440,240C1560,235,1680,245,1800,256C1920,267,2040,277,2160,277.3C2280,277,2400,267,2520,261.3C2640,256,2760,256,2820,256L2880,256V320H0Z"/>
+      </svg>
+    </div>
   </div>
+
+  <!-- Floating Bubbles -->
+  <div class="bubbles">
+    <div class="bubble" style="left:5%;width:12px;height:12px;animation-duration:8s;animation-delay:0s;"></div>
+    <div class="bubble" style="left:15%;width:8px;height:8px;animation-duration:12s;animation-delay:1s;"></div>
+    <div class="bubble" style="left:25%;width:16px;height:16px;animation-duration:10s;animation-delay:2.5s;"></div>
+    <div class="bubble" style="left:40%;width:6px;height:6px;animation-duration:14s;animation-delay:0.5s;"></div>
+    <div class="bubble" style="left:55%;width:10px;height:10px;animation-duration:9s;animation-delay:3s;"></div>
+    <div class="bubble" style="left:65%;width:14px;height:14px;animation-duration:11s;animation-delay:1.5s;"></div>
+    <div class="bubble" style="left:75%;width:7px;height:7px;animation-duration:13s;animation-delay:4s;"></div>
+    <div class="bubble" style="left:85%;width:11px;height:11px;animation-duration:10s;animation-delay:2s;"></div>
+    <div class="bubble" style="left:92%;width:9px;height:9px;animation-duration:15s;animation-delay:3.5s;"></div>
+  </div>
+
+  <!-- Login Card -->
   <div class="login-card">
-    <h2>Welcome Back!</h2>
+    <h2>Welcome Back! <span class="login-wave-emoji">👋</span></h2>
     <p class="login-subtitle">UoK Faculty of Science - Year 2 Results</p>
     <form onsubmit="handleLogin(event)">
       <div class="login-field">
-        <input type="text" id="loginId" placeholder="Student ID (e.g. EC/2023/001)" autocomplete="off" autofocus>
+        <input type="text" id="loginUser" placeholder="Username" autocomplete="off" autofocus>
         <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="login-field">
+        <input type="password" id="loginPwd" placeholder="Password" autocomplete="off">
+        <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <button type="button" class="toggle-pwd" onclick="togglePassword()" tabindex="-1">
+          <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
       </div>
       <button type="submit" class="login-btn">VIEW RESULTS</button>
       <div class="login-error" id="loginError"></div>
@@ -385,7 +517,8 @@ render();
 
 <!-- ===== LOGIN SCRIPT ===== -->
 <script>
-var VALID_IDS = ["EC/2022/080", "EC/2023/001", "EC/2023/002", "EC/2023/003", "EC/2023/004", "EC/2023/005", "EC/2023/006", "EC/2023/007", "EC/2023/008", "EC/2023/009", "EC/2023/010", "EC/2023/011", "EC/2023/012", "EC/2023/013", "EC/2023/014", "EC/2023/015", "EC/2023/016", "EC/2023/018", "EC/2023/020", "EC/2023/022", "EC/2023/023", "EC/2023/024", "EC/2023/025", "EC/2023/026", "EC/2023/027", "EC/2023/028", "EC/2023/029", "EC/2023/030", "EC/2023/031", "EC/2023/032", "EC/2023/033", "EC/2023/034", "EC/2023/035", "EC/2023/036", "EC/2023/037", "EC/2023/038", "EC/2023/039", "EC/2023/040", "EC/2023/041", "EC/2023/042", "EC/2023/043", "EC/2023/044", "EC/2023/045", "EC/2023/046", "EC/2023/047", "EC/2023/048", "EC/2023/049", "EC/2023/051", "EC/2023/052", "EC/2023/053", "EC/2023/054", "EC/2023/055", "EC/2023/056", "EC/2023/057", "EC/2023/060", "EC/2023/061", "EC/2023/062", "EC/2023/063", "EC/2023/065", "EC/2023/066", "EC/2023/068", "EC/2023/069", "EC/2023/070", "EC/2023/071", "EC/2023/072", "EC/2023/077", "EC/2023/078", "EC/2023/079", "EC/2023/080", "EC/2023/081", "EC/2023/082", "EC/2023/083", "EC/2023/084"];
+var AUTH_USER = 'ecs4';
+var AUTH_PASS = 'ecs4';
 
 function checkAuth() {
   var user = localStorage.getItem('uok_user');
@@ -397,33 +530,46 @@ function checkAuth() {
   return false;
 }
 
+function togglePassword() {
+  var pwdField = document.getElementById('loginPwd');
+  var eyeIcon = document.getElementById('eyeIcon');
+  if (pwdField.type === 'password') {
+    pwdField.type = 'text';
+    eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    pwdField.type = 'password';
+    eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
 function handleLogin(e) {
   e.preventDefault();
-  var input = document.getElementById('loginId').value.trim().toUpperCase();
+  var user = document.getElementById('loginUser').value.trim();
+  var pwd = document.getElementById('loginPwd').value;
   var errorEl = document.getElementById('loginError');
 
-  if (!input) {
-    errorEl.textContent = 'Please enter your Student ID';
+  if (!user) {
+    errorEl.textContent = 'Please enter your username';
     return;
   }
 
-  // Normalize: accept formats like EC2023001, EC/2023/001, ec/2023/001
-  var normalized = input.replace(/[^A-Z0-9]/g, '');
-  var match = normalized.match(/^EC(\d{4})(\d{3})$/);
-  if (match) {
-    input = 'EC/' + match[1] + '/' + match[2];
+  if (!pwd) {
+    errorEl.textContent = 'Please enter your password';
+    return;
   }
 
-  if (VALID_IDS.indexOf(input) === -1) {
-    errorEl.textContent = 'Student ID not found. Please check and try again.';
-    document.getElementById('loginId').style.borderColor = '#e53935';
+  if (user !== AUTH_USER || pwd !== AUTH_PASS) {
+    errorEl.textContent = 'Invalid username or password.';
+    document.getElementById('loginUser').style.borderColor = '#e53935';
+    document.getElementById('loginPwd').style.borderColor = '#e53935';
     setTimeout(function() {
-      document.getElementById('loginId').style.borderColor = '';
+      document.getElementById('loginUser').style.borderColor = '';
+      document.getElementById('loginPwd').style.borderColor = '';
     }, 2000);
     return;
   }
 
-  localStorage.setItem('uok_user', input);
+  localStorage.setItem('uok_user', user);
   errorEl.textContent = '';
   document.getElementById('loginPage').classList.add('hidden');
   setTimeout(function() {
@@ -435,7 +581,8 @@ function handleLogout() {
   localStorage.removeItem('uok_user');
   document.getElementById('dashboard').classList.remove('visible');
   document.getElementById('loginPage').classList.remove('hidden');
-  document.getElementById('loginId').value = '';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPwd').value = '';
   document.getElementById('loginError').textContent = '';
 }
 

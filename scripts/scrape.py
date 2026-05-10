@@ -40,11 +40,20 @@ STUDENT_IDS = [
     "EC/2023/082", "EC/2023/083", "EC/2023/084",
 ]
 
-# IDs known to be password-protected (skip in rotation to save time)
-PROTECTED_IDS = {
-    "EC/2022/080", "EC/2023/004", "EC/2023/006", "EC/2023/040", "EC/2023/041",
-    "EC/2023/054", "EC/2023/060", "EC/2023/065", "EC/2023/066",
-    "EC/2023/070", "EC/2023/071",
+# Passwords for protected IDs. If an ID is here with an empty password, it will be skipped in rotation.
+# If a password is provided, it will be scraped normally.
+PROTECTED_CREDENTIALS = {
+    "EC/2022/080": "",
+    "EC/2023/004": "",
+    "EC/2023/006": "",
+    "EC/2023/040": "",
+    "EC/2023/041": "",
+    "EC/2023/054": "",
+    "EC/2023/060": "",
+    "EC/2023/065": "",
+    "EC/2023/066": "",
+    "EC/2023/070": "",
+    "EC/2023/071": "",
 }
 
 
@@ -68,12 +77,15 @@ def login(session, student_id):
     base_session_url = current_url.rsplit("/", 1)[0]
     post_url = base_session_url + "/" + action.lstrip("./")
 
+    # Get password if configured
+    password = PROTECTED_CREDENTIALS.get(student_id, "")
+
     data = {
         "__VIEWSTATE": hidden.get("__VIEWSTATE", ""),
         "__VIEWSTATEGENERATOR": hidden.get("__VIEWSTATEGENERATOR", ""),
         "__EVENTVALIDATION": hidden.get("__EVENTVALIDATION", ""),
         "Usernametxt": student_id,
-        "PasswordTxt": "",
+        "PasswordTxt": password,
         "LoginBT": "Sign in",
     }
 
@@ -331,11 +343,14 @@ def save_state(state_file, state):
 
 
 def get_next_scrapeable_index(current_index):
-    """Get next student index, skipping protected IDs."""
+    """Get next student index, skipping protected IDs that don't have a password."""
     total = len(STUDENT_IDS)
     for _ in range(total):
         current_index = current_index % total
-        if STUDENT_IDS[current_index] not in PROTECTED_IDS:
+        student_id = STUDENT_IDS[current_index]
+        
+        # Scrape if it's not protected, OR if we have a password for it
+        if student_id not in PROTECTED_CREDENTIALS or PROTECTED_CREDENTIALS.get(student_id):
             return current_index
         current_index += 1
     return 0  # fallback

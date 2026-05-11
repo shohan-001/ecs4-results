@@ -375,9 +375,17 @@ function calculateActualGPA(courses) {
   courses.forEach(c => {
     let code = c['Course Code'] || c['CourseCode'] || '';
     let grade = (c['Grade'] || '').trim().toUpperCase();
+    let examStatus = (c['ExamStatus'] || '').trim().toUpperCase();
     
     // Skip headers and non-GPA courses
-    if (code.startsWith('Course Code') || code.startsWith('ACLT') || !grade) return;
+    if (code.startsWith('Course Code') || code.startsWith('ACLT')) return;
+    
+    // Treat Absent as 0.0
+    if (examStatus === 'ABSENT' || grade === 'ABS' || grade === '**') {
+      grade = 'E'; // Map to 0.0 grade point
+    }
+    
+    if (!grade) return;
     
     // Extract credit from last digit of course code (e.g. BECS 11223 -> 3)
     let creditMatch = code.match(/\d$/);
@@ -385,7 +393,15 @@ function calculateActualGPA(courses) {
     let credits = parseInt(creditMatch[0]);
     
     if (gradePoints.hasOwnProperty(grade)) {
-      totalPoints += (gradePoints[grade] * credits);
+      let gp = gradePoints[grade];
+      
+      // If repeating (Attempt > 1), max grade point is C (2.0)
+      let attempt = parseInt(c['Attempt']) || 1;
+      if (attempt > 1 && gp > 2.0) {
+        gp = 2.0;
+      }
+      
+      totalPoints += (gp * credits);
       totalCredits += credits;
     }
   });

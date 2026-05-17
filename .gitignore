@@ -1,0 +1,6 @@
+config.json
+protected_creds.json
+__pycache__/
+*.pyc
+venv/
+.env

@@ -1,0 +1,15 @@
+[Unit]
+Description=UoK Results Portal (Flask)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/results-portal
+ExecStart=/opt/results-portal/venv/bin/gunicorn --bind 127.0.0.1:5000 --workers 2 --timeout 120 app:app
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

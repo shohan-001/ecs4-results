@@ -1,0 +1,9 @@
+[Unit]
+Description=Run Results Scraper
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/results-portal
+ExecStart=/opt/results-portal/venv/bin/python scripts/scrape.py
+TimeoutStartSec=1800
+Environment=PYTHONUNBUFFERED=1

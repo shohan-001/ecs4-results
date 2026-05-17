@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a192f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="UoK Results">
+<link rel="manifest" href="/manifest.json">
+<title>UoK Science Results Portal</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div class="login-page" id="loginPage">
+  <div class="bubbles"><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div></div>
+  <div class="login-waves"><svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+    <path class="wave1" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128V320H0Z"/>
+    <path class="wave2" d="M0,256L48,229.3C96,203,192,149,288,154.7C384,160,480,224,576,218.7C672,213,768,139,864,128C960,117,1056,171,1152,197.3C1248,224,1344,224,1392,224L1440,224V320H0Z"/>
+    <path class="wave3" d="M0,224L48,240C96,256,192,288,288,277.3C384,267,480,213,576,192C672,171,768,181,864,197.3C960,213,1056,235,1152,224C1248,213,1344,171,1392,149.3L1440,128V320H0Z"/>
+  </svg></div>
+  <div class="login-card">
+    <h2>Welcome Back! <span class="wave-emoji">👋</span></h2>
+    <p class="login-subtitle">UoK Faculty of Science — Results Portal</p>
+    <form onsubmit="handleLogin(event)">
+      <div class="login-field"><input type="text" id="loginUser" placeholder="Username" autocomplete="off" autofocus>
+        <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="login-field"><input type="password" id="loginPwd" placeholder="Password" autocomplete="off">
+        <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <button type="button" class="toggle-pwd" onclick="togglePassword()"><svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      <button type="submit" class="login-btn">VIEW RESULTS</button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+    <div class="login-footer">University of Kelaniya &copy; 2025</div>
+  </div>
+</div>
+
+<!-- ===== DEPARTMENT SELECTION ===== -->
+<div class="page hidden" id="deptPage">
+  <div class="header">
+    <h1>UoK Science Results</h1>
+    <p>Faculty of Science — Select Your Department</p>
+    <p class="meta">Last Updated: <span id="lastUpdated">—</span></p>
+    <div class="header-actions">
+      <button class="header-btn" onclick="showAdmin()" title="Admin">⚙️</button>
+      <button class="header-btn" onclick="handleLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="dept-grid" id="deptGrid"></div>
+  </div>
+</div>
+
+<!-- ===== RESULTS VIEW ===== -->
+<div class="page hidden" id="resultsPage">
+  <div class="header">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <h1 id="deptTitle">Department</h1>
+    <p id="deptSubtitle"></p>
+    <div class="header-actions"><button class="header-btn" onclick="handleLogout()">Logout</button></div>
+  </div>
+  <div class="container">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search ID, name, or course..." oninput="renderResults()">
+      <button class="sort-btn" id="sortBtn" onclick="toggleSort()">Sort</button>
+    </div>
+    <div class="tab-row">
+      <button class="tab active" onclick="setTab('all')">All</button>
+      <button class="tab" onclick="setTab('results')">Results</button>
+      <button class="tab" onclick="setTab('protected')">Protected</button>
+    </div>
+    <div id="studentList"></div>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div class="page hidden" id="adminPage">
+  <div class="header admin-header">
+    <button class="back-btn" onclick="hideAdmin()">← Back</button>
+    <h1>Admin Panel</h1>
+    <p>Scraper Control &amp; Settings</p>
+  </div>
+  <!-- Admin login -->
+  <div class="container" id="adminLogin">
+    <div class="admin-card">
+      <h3>Admin Authentication</h3>
+      <div class="admin-field"><input type="text" id="adminUser" placeholder="Admin Username"></div>
+      <div class="admin-field"><input type="password" id="adminPwd" placeholder="Admin Password"></div>
+      <button class="admin-btn" onclick="adminLoginSubmit()">Login as Admin</button>
+      <div class="login-error" id="adminError"></div>
+    </div>
+  </div>
+  <!-- Admin controls (shown after login) -->
+  <div class="container hidden" id="adminControls">
+    <!-- Scraper Status -->
+    <div class="admin-card">
+      <h3>📡 Scraper Status</h3>
+      <div id="scrapeStatus">Loading...</div>
+      <div class="status-bar"><div class="status-fill" id="statusFill"></div></div>
+    </div>
+    <!-- Manual Scrape -->
+    <div class="admin-card">
+      <h3>🔄 Manual Scrape</h3>
+      <div class="admin-row">
+        <select id="scrapeMode"><option value="rotation">Rotation (probe 1 per dept)</option><option value="full">Full Scrape</option><option value="discover">Discover New Students</option></select>
+        <select id="scrapeDept"><option value="">All Departments</option>
+          <option value="ec">EC — Electronics &amp; CS</option><option value="ps">PS — Physical Science</option>
+          <option value="pe">PE — Physics &amp; Electronics</option><option value="ss">SS — Sport Science</option>
+          <option value="bs">BS — Biological Science</option><option value="ac">AC — Applied Chemistry</option>
+          <option value="em">EM — Environmental Mgmt</option><option value="se">SE — Software Engineering</option>
+        </select>
+      </div>
+      <button class="admin-btn" onclick="triggerScrape()" id="scrapeBtn">Start Scrape</button>
+    </div>
+    <!-- Interval Config -->
+    <div class="admin-card">
+      <h3>⏱️ Auto-Scrape Interval</h3>
+      <div class="admin-row">
+        <select id="intervalSelect"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="60">1 hour</option><option value="120">2 hours</option><option value="180">3 hours</option></select>
+        <button class="admin-btn small" onclick="updateInterval()">Save</button>
+      </div>
+    </div>
+    <!-- Change Passwords -->
+    <div class="admin-card">
+      <h3>🔑 Change Passwords</h3>
+      <div class="admin-field"><label>User Password (ecs4)</label><input type="text" id="newUserPwd" placeholder="New user password"></div>
+      <div class="admin-field"><label>Admin Password</label><input type="text" id="newAdminPwd" placeholder="New admin password"></div>
+      <button class="admin-btn small" onclick="updatePasswords()">Update Passwords</button>
+    </div>
+    <!-- Protected Students -->
+    <div class="admin-card">
+      <h3>🔒 Protected Students</h3>
+      <p class="admin-hint">Enter passwords for protected accounts so the scraper can access their results.</p>
+      <div id="protectedList">Loading...</div>
+      <div class="admin-row" style="margin-top:12px">
+        <input type="text" id="protSid" placeholder="Student ID (e.g. EC/2023/004)">
+        <input type="password" id="protPwd" placeholder="Password">
+        <button class="admin-btn small" onclick="addProtected()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

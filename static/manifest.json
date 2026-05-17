@@ -1,0 +1,13 @@
+{
+  "name": "UoK Science Results Portal",
+  "short_name": "UoK Results",
+  "description": "University of Kelaniya Faculty of Science Results Portal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a192f",
+  "theme_color": "#0a192f",
+  "icons": [
+    {"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
